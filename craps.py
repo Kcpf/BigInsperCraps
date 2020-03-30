@@ -5,6 +5,8 @@ def dados():
     dado2 = random.randint(1, 6)
     soma = dado1 + dado2
 
+    while True:
+        if input("Aperte F para rodar dado? ") == "f": break
 
     print(f"Dado 1: {dado1} e Dado 2: {dado2}")
     print(f"Soma: {soma}")
@@ -26,7 +28,23 @@ def passLineBet():
     
     return (aposta, soma, False)
 
-        
+def point_função(aposta, somaPoint):
+    (dado1, dado2, soma) = dados()
+
+    while soma not in [7, somaPoint]:
+        (dado1, dado2, soma) = dados()
+    
+    if soma == somaPoint:
+        print("Você ganhou o Point e voltou para o Come Out!")
+        return aposta
+    
+    else:
+        print("Você perdeu o Point e voltou para o Come Out!")
+        return 0
+
+
+    
+       
     
 din = 100
 point = False
@@ -39,13 +57,20 @@ while True:
             if point == False:
                 din += aposta
                 print(f'Saldo atual: {din}')
-                
+                resp = input("Deseja parar? ")
+                if resp == 's': break
             else:
                 din -= aposta
                 print(f'Saldo atual: {din}')
                 print(f'Valor apostado: {aposta}')
     
-    break
+    else:
+        aposta_point = point_função(aposta, somaPoint)
+        din += aposta_point
+        print(f'Saldo atual: {din}')
+        point = False
+        resp = input("Deseja parar? ")
+        if resp == 's': break
         
 
 
