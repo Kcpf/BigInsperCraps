@@ -101,7 +101,20 @@ while True:
                 din -= aposta
                 print(f'Saldo atual: {din}')
                 print(f'Valor apostado: {aposta}')
-    
+
+        elif tipo_aposta == "F":
+            din += field()
+            print(f'Saldo atual: {din}')
+
+        elif tipo_aposta == "AC":
+            din += anyCraps()
+            print(f'Saldo atual: {din}')
+
+        elif tipo_aposta == "T":
+            din += twelve()
+            print(f'Saldo atual: {din}')
+
+   
     else:
         aposta_point = point_função(aposta, somaPoint)
         din += aposta_point
