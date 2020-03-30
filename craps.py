@@ -145,21 +145,51 @@ def point(somaPoint, aposta, din):
 
 
 
-din = 100
-passou = False
+def main():
+    quer_jogar = True
+    esta_no_point = False
+    dinheiro = 1000
+    dinheiro_apostado = 0
+    soma_dados_point = 0
 
-while True:
-    (lucroOuPrejuizo, lista) = comeOut()
-    if isinstance(lucroOuPrejuizo, str):
-        break
+    vamos_jogar = input("""Bem vindo ao Big Insper Craps!
+Vamos jogar?
+digite 'S' para jogar e 'N' para sair    Digite: """)
 
-    din += lucroOuPrejuizo
-    print(f'Saldo atual:{din}')
+    if vamos_jogar == 'N':
+        quer_jogar = False
+    
+    else:
+        print('Voce ira iniciar com 1000 fichas')
 
-    if lista[0]: 
-        passou = True
-        somaPoint = lista[1]
-        aposta = lista[2]
 
-    if passou:
-        din = point(somaPoint, aposta, din)
+    while quer_jogar:
+        if dinheiro <= 0 and dinheiro_apostado <= 0:
+            print('Que pena! Suas fichas acabaram')
+            break
+        elif not esta_no_point:
+            dinheiro_local, vai_para_o_point, soma, dinheiro_apostado = come_out(dinheiro)
+            dinheiro = dinheiro_local
+            esta_no_point = vai_para_o_point
+            soma_dados_point = soma
+            if dinheiro_apostado == 0:
+                print(f'Seu saldo atual é de {dinheiro} fichas')
+            else: 
+                print(f'Seu saldo atual é de {dinheiro} fichas e voce possui {dinheiro_apostado} fichas apostadas')
+
+        elif esta_no_point:
+            dinheiro_local, esta_no_point = point(dinheiro, soma_dados_point, dinheiro_apostado)
+            dinheiro = dinheiro_local
+            print(f'Seu saldo atual é de {dinheiro} fichas')
+
+
+        vamos_jogar = input("""Quer continuar jogando?
+digite 'S' para continuar e 'N' para sair    Digite: """)
+
+        if vamos_jogar == 'N':
+            quer_jogar = False
+            
+
+    
+    
+    return('Obrigado por jogar! Até a próxima')
