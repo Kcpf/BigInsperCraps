@@ -139,42 +139,90 @@ def come_out(dinheiro):
     
 
 
-def point(somaPoint, aposta, din):
+def point(dinheiro, soma_dados_point, dinheiro_apostado):
+    print('Voce esta na fase de Point')
     soma = 0
-    while soma not in [7, somaPoint]:
-        tiposDeAposta = input("Em qual quer apostar (N para não apostar e rolar os dados)? Ex: AC,T,P   Digite: ").split(",")
+    dinheiro_local = dinheiro
+    teste_aposta = 0
+    aposta_total = 0
+    valida_aposta = False
+    valida_tipo_aposta = False
+    lucro = 0
+    todas_apostas = {"F": field, "AC": any_craps, "T": twelve}
+    lucro_total = 0
+    dic = {}
+    quantia_apostada_em_cada_aposta = []
+    nomes_das_apostas = {"F":"Field", "AC":"Any Craps", "T":"Twelve"}
+    siglas_apostas = ["N", "F", "AC", "T"]
+    
+    while soma not in [7, soma_dados_point]:
         
-        while tiposDeAposta[0] not in ["N", "PLB", "F", "AC", "T"]:
-            tiposDeAposta = input("Em qual quer apostar (N para não apostar e sair do jogo)? Ex: PLB,F,AC,T   Digite: ").split(",")
+        teste_aposta = 0
+        aposta_total = 0
+        valida_aposta = False
+        valida_tipo_aposta = False
+        lucro = 0
+        lucro_total = 0
+        dic = {}
+        quantia_apostada_em_cada_aposta = []
+            
+    
+        tipos_de_aposta = input("Em qual quer apostar (N para não apostar e sair do jogo)? Ex: F,AC,T   Digite: ").split(",")
+
+        while valida_tipo_aposta == False:
+            for nums in range(len(tipos_de_aposta)):
+                if tipos_de_aposta[nums] not in ["N", "F", "AC", "T"]:
+                    tipos_de_aposta = input("Em qual quer apostar (N para não apostar e sair do jogo)? Ex: F,AC,T    Digite: ").split(",")
+            else:
+                valida_tipo_aposta = True
         
+        tipos_de_aposta.sort()
+
         (dado1, dado2, soma) = dados()
 
-        if tiposDeAposta[0] != "N":
-            dic = {"F": field, "AC": anyCraps, "T": twelve}
-            
-            lucroOuPrejuizo = []
 
-            for aposta in tiposDeAposta:
-                lucroOuPrejuizo.append(dic[aposta](soma))
-            
-            stats(dado1, dado2, soma)
-            
-            for e in range(len(lucroOuPrejuizo)):
-                if lucroOuPrejuizo[e] > 0:
-                    print(f"Você ganhou {abs(lucroOuPrejuizo[e])} na aposta {tiposDeAposta[e]}")
-                elif lucroOuPrejuizo[e] == 0:
-                    print(f"Você não ganhou nada na aposta {tiposDeAposta[e]}")
+        for tipos in tipos_de_aposta:
+            valida_aposta = False
+            while valida_aposta == False:
+                teste_aposta = int(input(f'Quanto quer apostar no {nomes_das_apostas[tipos]}?    Digite: '))
+                aposta_total+=teste_aposta
+                if aposta_total <= dinheiro_local and aposta_total >= 0:
+                    quantia_apostada_em_cada_aposta.append(teste_aposta)
+                    valida_aposta = True 
                 else:
-                    print(f"Você perdeu {abs(lucroOuPrejuizo[e])} na aposta {tiposDeAposta[e]}")   
-        else:
-            stats(dado1, dado2, soma)      
+                    print('aposta invalida')
+                    aposta_total-=teste_aposta
+
+        print(stats(dado1, dado2, soma))
+
+        for num in range(len(tipos_de_aposta)):
+            dic[tipos_de_aposta[num]] = quantia_apostada_em_cada_aposta[num]
+
+        for tipos in todas_apostas:
+
+            if tipos in tipos_de_aposta:
+                lucro = todas_apostas[tipos](True, dic[tipos], soma)
+
+            else:
+                lucro = todas_apostas[tipos](False, 0, soma)
             
-    if soma == somaPoint:
-        print(f"Você ganhou o Point, recuperou seus {aposta} e voltou para o Come Out!")
-        return din + float(aposta)
+            if lucro > 0:
+                lucro_total+=lucro
+                print(f'Voce ganhou {lucro} no {nomes_das_apostas[tipos]}')
+
+            elif lucro < 0:
+                lucro_total+=lucro
+                print(f'Voce perdeu {-lucro} no {nomes_das_apostas[tipos]}')
+
+            dinheiro_local+=lucro_total
+
+
+    if soma == soma_dados_point:
+        print(f"Você ganhou o Point, recuperou suas {dinheiro_apostado} fichas apostadas e voltou para o Come Out!")
+        return dinheiro_local + dinheiro_apostado, False
     else:
         print("Você perdeu o Point e voltou para o Come Out!")
-        return din - float(aposta)
+        return dinheiro_local, False
 
 
 
