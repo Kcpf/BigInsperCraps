@@ -57,50 +57,84 @@ def twelve(soma):
     return aposta
 
 
-def comeOut():
-    nomesDasApostas = ['Pass Line Bet', 'Field', 'Any Craps', 'Twelve']
-    tiposDeAposta = input("Em qual quer apostar (N para não apostar e sair do jogo)? Ex: PLB,F,AC,T   Digite: ").split(",")
+def come_out(dinheiro):
+
+    print('Voce esta na fase de Come Out')
+
+    dinheiro_apostado = 0
+    dinheiro_local = dinheiro
+    teste_aposta = 0
+    aposta_total = 0
+    valida_aposta = False
+    lucro = 0
+    vai_para_o_point = False
+    todas_apostas = {"F": field, "AC": any_craps, "T": twelve}
+    lucro_total = 0
+    dic = {}
+    quantia_apostada_em_cada_aposta = []
+    nomes_das_apostas = {"PLB":"Pass Line Bet", "F":"Field", "AC":"Any Craps", "T":"Twelve"}
+    tipos_de_aposta = input("Em qual quer apostar (N para não apostar e sair do jogo)? Ex: PLB,F,AC,T   Digite: ").split(",")
     
-    while tiposDeAposta[0] not in ["N", "PLB", "F", "AC", "T"]:
-        tiposDeAposta = input("Em qual quer apostar (N para não apostar e sair do jogo)? Ex: PLB,F,AC,T    Digite: ").split(",")
+    while tipos_de_aposta[0] not in ["N", "PLB", "F", "AC", "T"]:
+        tipos_de_aposta = input("Em qual quer apostar (N para não apostar e sair do jogo)? Ex: PLB,F,AC,T    Digite: ").split(",")
     
-    if "N" in tiposDeAposta:
-        return ('f', [])
-    
+    tipos_de_aposta.sort()
 
     (dado1, dado2, soma) = dados()
 
-    dic = {"PLB": passLineBet, "F": field, "AC": anyCraps, "T": twelve}
-    
-    lucroOuPrejuizo = []
-    lista = [False, soma, 0]
 
-    for aposta in tiposDeAposta:
-        
-        if aposta == "PLB":
-            lista = dic[aposta](soma) # Lista => [bol, soma, aposta]
-        
-            if lista[0] == False:
-                lucroOuPrejuizo.append(lista[2])
+    for tipos in tipos_de_aposta:
+        valida_aposta = False
+        while valida_aposta == False:
+            teste_aposta = int(input(f'Quanto quer apostar no {nomes_das_apostas[tipos]}?    Digite: '))
+            aposta_total+=teste_aposta
+            if aposta_total <= dinheiro_local and aposta_total >= 0:
+                quantia_apostada_em_cada_aposta.append(teste_aposta)
+                valida_aposta = True 
             else:
-                lucroOuPrejuizo.append(-lista[2])
-        else:
-            lucroOuPrejuizo.append(dic[aposta](soma))
-    
-    stats(dado1, dado2, soma)
-    
-    for e in range(len(lucroOuPrejuizo)):
-        if lucroOuPrejuizo[e] > 0:
-            print(f"Você ganhou {abs(lucroOuPrejuizo[e])} na aposta {tiposDeAposta[e]}")
-        elif lucroOuPrejuizo[e] == 0:
-            print(f"Você não ganhou nada na aposta {tiposDeAposta[e]}")
-        else:
-            print(f"Você perdeu {abs(lucroOuPrejuizo[e])} na aposta {tiposDeAposta[e]}")
-    
+                print('aposta invalida')
+                aposta_total-=teste_aposta
 
-    
-    return (sum(lucroOuPrejuizo), lista)
+    print(stats(dado1, dado2, soma))
 
+    for num in range(len(tipos_de_aposta)):
+        dic[tipos_de_aposta[num]] = quantia_apostada_em_cada_aposta[num]
+
+    print(quantia_apostada_em_cada_aposta,tipos_de_aposta,dic)
+
+    for tipos in todas_apostas:
+
+        if tipos in tipos_de_aposta:
+            lucro = todas_apostas[tipos](True, dic[tipos], soma)
+
+        else:
+            lucro = todas_apostas[tipos](False, 0, soma)
+        
+        if lucro > 0:
+            lucro_total+=lucro
+            print(f'Voce ganhou {lucro} no {nomes_das_apostas[tipos]}')
+
+        elif lucro < 0:
+            lucro_total+=lucro
+            print(f'Voce perdeu {-lucro} no {nomes_das_apostas[tipos]}')
+
+    if "PLB" in tipos_de_aposta:
+        lucro, vai_para_o_point, soma = pass_line_bet(True, dic["PLB"], soma)
+        if lucro > 0:
+            print(f'Voce ganhou {lucro} no {nomes_das_apostas["PLB"]}')
+            lucro_total+=lucro
+        elif lucro < 0 and vai_para_o_point == False:
+            print(f'Voce perdeu {-lucro} no {nomes_das_apostas["PLB"]}')
+            lucro_total+=lucro
+        elif lucro < 0 and vai_para_o_point == True:
+            print("Você foi para o Point!")
+            dinheiro_apostado = dic["PLB"]
+            lucro_total+=lucro
+
+
+    dinheiro_local+=lucro_total
+
+    return dinheiro_local, vai_para_o_point, soma, dinheiro_apostado
     
     
 
