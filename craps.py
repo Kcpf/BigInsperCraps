@@ -43,7 +43,45 @@ def point_função(aposta, somaPoint):
         return 0
 
 
+def field():
+    aposta = float(input("Quanto deseja apostar no Field? "))
+
+    if soma in [5, 6, 7, 8]:
+        print(f"Você perdeu! :(")
+        return -aposta
+    elif soma in [3, 4, 9, 10, 11]:
+        print(f"Você ganhou {aposta}!")
+        return aposta
+    elif soma == 2:
+        print(f"Você ganhou {aposta*2}!")
+        return aposta * 2
+    elif soma == 12:
+        print(f"Você ganhou {aposta*3}!")
+        return aposta * 3
+        
+
+def anyCraps():
+    aposta = float(input("Quanto deseja apostar no Pass Line? "))
     
+    if soma in [2, 3, 12]:
+        aposta*=7
+        print(f"Você ganhou {aposta}!")
+    else:
+        aposta = -aposta
+        print(f"Você perdeu! :(")
+    return aposta
+
+def twelve():
+    aposta = float(input("Quanto deseja apostar no Pass Line? ")) 
+    
+    if soma == 12:
+        aposta *= 30
+        print(f"Você ganhou {aposta}!")
+    else:
+        aposta = -aposta
+        print(f"Você perdeu! :(")
+    return aposta
+
        
     
 din = 100
