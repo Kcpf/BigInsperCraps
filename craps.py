@@ -101,3 +101,64 @@ def comeOut():
     
     return (sum(lucroOuPrejuizo), lista)
 
+
+
+
+def point(somaPoint, aposta, din):
+    soma = 0
+    while soma not in [7, somaPoint]:
+        tiposDeAposta = input("Em qual quer apostar (N para não apostar e rolar os dados)? Ex: AC,T,P   Digite: ").split(",")
+        
+        while tiposDeAposta[0] not in ["N", "PLB", "F", "AC", "T"]:
+            tiposDeAposta = input("Em qual quer apostar (N para não apostar e sair do jogo)? Ex: PLB,F,AC,T   Digite: ").split(",")
+        
+        (dado1, dado2, soma) = dados()
+
+        if tiposDeAposta[0] != "N":
+            dic = {"F": field, "AC": anyCraps, "T": twelve}
+            
+            lucroOuPrejuizo = []
+
+            for aposta in tiposDeAposta:
+                lucroOuPrejuizo.append(dic[aposta](soma))
+            
+            stats(dado1, dado2, soma)
+            
+            for e in range(len(lucroOuPrejuizo)):
+                if lucroOuPrejuizo[e] > 0:
+                    print(f"Você ganhou {abs(lucroOuPrejuizo[e])} na aposta {tiposDeAposta[e]}")
+                elif lucroOuPrejuizo[e] == 0:
+                    print(f"Você não ganhou nada na aposta {tiposDeAposta[e]}")
+                else:
+                    print(f"Você perdeu {abs(lucroOuPrejuizo[e])} na aposta {tiposDeAposta[e]}")   
+        else:
+            stats(dado1, dado2, soma)      
+            
+    if soma == somaPoint:
+        print(f"Você ganhou o Point, recuperou seus {aposta} e voltou para o Come Out!")
+        return din + float(aposta)
+    else:
+        print("Você perdeu o Point e voltou para o Come Out!")
+        return din - float(aposta)
+
+
+
+
+din = 100
+passou = False
+
+while True:
+    (lucroOuPrejuizo, lista) = comeOut()
+    if isinstance(lucroOuPrejuizo, str):
+        break
+
+    din += lucroOuPrejuizo
+    print(f'Saldo atual:{din}')
+
+    if lista[0]: 
+        passou = True
+        somaPoint = lista[1]
+        aposta = lista[2]
+
+    if passou:
+        din = point(somaPoint, aposta, din)
