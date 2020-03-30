@@ -1,5 +1,10 @@
 import random
 
+def stats(dado1, dado2, soma):
+    print(f"Dado 1: {dado1} e Dado 2: {dado2}")
+    print(f"Soma: {soma}")
+    return None
+
 def dados():
     dado1 = random.randint(1, 6)
     dado2 = random.randint(1, 6)
@@ -8,122 +13,91 @@ def dados():
     while True:
         if input("Aperte F para rodar dado? ") == "f": break
 
-    print(f"Dado 1: {dado1} e Dado 2: {dado2}")
-    print(f"Soma: {soma}")
-    
     return (dado1, dado2, dado1+dado2)
 
-def passLineBet():
-    aposta = float(input("Quanto deseja apostar no Pass Line? "))
-    (dado1, dado2, soma) = dados()
-    
-    if soma in [7, 11]:
-        print(f"Você ganhou {aposta}!")
-    elif soma in [2, 3, 12]:
-        aposta = -aposta
-        print(f"Você perdeu! :(")
-    else:
-        print("Você foi para o Point!")
-        return (aposta, soma, True)
-    
-    return (aposta, soma, False)
-
-def point_função(aposta, somaPoint):
-    (dado1, dado2, soma) = dados()
-
-    while soma not in [7, somaPoint]:
-        (dado1, dado2, soma) = dados()
-    
-    if soma == somaPoint:
-        print("Você ganhou o Point e voltou para o Come Out!")
-        return aposta
-    
-    else:
-        print("Você perdeu o Point e voltou para o Come Out!")
-        return 0
-
-
-def field():
-    aposta = float(input("Quanto deseja apostar no Field? "))
-
-    if soma in [5, 6, 7, 8]:
-        print(f"Você perdeu! :(")
-        return -aposta
-    elif soma in [3, 4, 9, 10, 11]:
-        print(f"Você ganhou {aposta}!")
-        return aposta
-    elif soma == 2:
-        print(f"Você ganhou {aposta*2}!")
-        return aposta * 2
-    elif soma == 12:
-        print(f"Você ganhou {aposta*3}!")
-        return aposta * 3
-        
-
-def anyCraps():
+def passLineBet(soma):
     aposta = float(input("Quanto deseja apostar no Pass Line? "))
     
     if soma in [2, 3, 12]:
-        aposta*=7
-        print(f"Você ganhou {aposta}!")
+        aposta = -aposta
+    elif soma in [4, 5, 6, 8, 9, 10]:
+        print("Você foi para o Point!")
+        return (True, soma, aposta)
+    
+    return (False, soma, aposta)
+
+def field(soma):
+    aposta = float(input("Quanto deseja apostar no Field? "))
+
+    if soma in [5, 6, 7, 8]:
+        return -aposta
+    elif soma in [3, 4, 9, 10, 11]:
+        return aposta
+    elif soma == 2:
+        return aposta * 2
+    elif soma == 12:
+        return aposta * 3       
+
+def anyCraps(soma):
+    aposta = float(input("Quanto deseja apostar no Any Craps? "))
+    
+    if soma in [2, 3, 12]:
+        aposta *= 7
     else:
         aposta = -aposta
-        print(f"Você perdeu! :(")
     return aposta
 
-def twelve():
-    aposta = float(input("Quanto deseja apostar no Pass Line? ")) 
+def twelve(soma):
+    aposta = float(input("Quanto deseja apostar no Twelve? ")) 
     
     if soma == 12:
         aposta *= 30
-        print(f"Você ganhou {aposta}!")
     else:
         aposta = -aposta
-        print(f"Você perdeu! :(")
     return aposta
 
-       
+
+def comeOut():
+    nomesDasApostas = ['Pass Line Bet', 'Field', 'Any Craps', 'Twelve']
+    tiposDeAposta = input("Em qual quer apostar (N para não apostar e sair do jogo)? Ex: PLB,F,AC,T   Digite: ").split(",")
     
-din = 100
-point = False
+    while tiposDeAposta[0] not in ["N", "PLB", "F", "AC", "T"]:
+        tiposDeAposta = input("Em qual quer apostar (N para não apostar e sair do jogo)? Ex: PLB,F,AC,T    Digite: ").split(",")
+    
+    if "N" in tiposDeAposta:
+        return ('f', [])
+    
 
-while True:
-    if not point:
-        tipo_aposta = input("Em qual quer apostar?")
-        if tipo_aposta == "P":
-            (aposta, somaPoint, point) = passLineBet()
-            if point == False:
-                din += aposta
-                print(f'Saldo atual: {din}')
-                resp = input("Deseja parar? ")
-                if resp == 's': break
-            else:
-                din -= aposta
-                print(f'Saldo atual: {din}')
-                print(f'Valor apostado: {aposta}')
+    (dado1, dado2, soma) = dados()
 
-        elif tipo_aposta == "F":
-            din += field()
-            print(f'Saldo atual: {din}')
+    dic = {"PLB": passLineBet, "F": field, "AC": anyCraps, "T": twelve}
+    
+    lucroOuPrejuizo = []
+    lista = [False, soma, 0]
 
-        elif tipo_aposta == "AC":
-            din += anyCraps()
-            print(f'Saldo atual: {din}')
-
-        elif tipo_aposta == "T":
-            din += twelve()
-            print(f'Saldo atual: {din}')
-
-   
-    else:
-        aposta_point = point_função(aposta, somaPoint)
-        din += aposta_point
-        print(f'Saldo atual: {din}')
-        point = False
-        resp = input("Deseja parar? ")
-        if resp == 's': break
+    for aposta in tiposDeAposta:
         
+        if aposta == "PLB":
+            lista = dic[aposta](soma) # Lista => [bol, soma, aposta]
+        
+            if lista[0] == False:
+                lucroOuPrejuizo.append(lista[2])
+            else:
+                lucroOuPrejuizo.append(-lista[2])
+        else:
+            lucroOuPrejuizo.append(dic[aposta](soma))
+    
+    stats(dado1, dado2, soma)
+    
+    for e in range(len(lucroOuPrejuizo)):
+        if lucroOuPrejuizo[e] > 0:
+            print(f"Você ganhou {abs(lucroOuPrejuizo[e])} na aposta {tiposDeAposta[e]}")
+        elif lucroOuPrejuizo[e] == 0:
+            print(f"Você não ganhou nada na aposta {tiposDeAposta[e]}")
+        else:
+            print(f"Você perdeu {abs(lucroOuPrejuizo[e])} na aposta {tiposDeAposta[e]}")
+    
 
-
-
+    
+    return (sum(lucroOuPrejuizo), lista)
 
