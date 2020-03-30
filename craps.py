@@ -1,61 +1,91 @@
 import random
 
-def stats(dado1, dado2, soma):
-    print(f"Dado 1: {dado1} e Dado 2: {dado2}")
-    print(f"Soma: {soma}")
-    return None
+dados_desenho = {1:""" -------
+|       |
+|   *   |
+|       |
+ ------- 
+""", 2:""" -------
+| *     |
+|       |
+|     * |
+ ------- 
+""", 3:""" -------
+| *     |
+|   *   |
+|     * |
+ -------
+ """, 4:""" -------
+| *   * |
+|       |
+| *   * |
+ -------
+  """, 5:""" -------
+| *   * |
+|   *   |
+| *   * |
+ -------
+  """, 6:""" -------
+| *   * |
+| *   * |
+| *   * |
+ -------"""}
 
 def dados():
     dado1 = random.randint(1, 6)
     dado2 = random.randint(1, 6)
     soma = dado1 + dado2
 
+    return dado1, dado2, soma
+
+def stats(dado1, dado2, soma):
+
     while True:
         if input("Aperte F para rodar dado? ") == "f": break
 
-    return (dado1, dado2, dado1+dado2)
+    return(f"""{dados_desenho[dado1]}\n{dados_desenho[dado2]}""")
 
-def passLineBet(soma):
-    aposta = float(input("Quanto deseja apostar no Pass Line? "))
+def field(vai_apostar, valor_da_aposta, soma):
+
+    if vai_apostar:
+        if soma in [5, 6, 7, 8]:
+            return -valor_da_aposta
+        elif soma in [3, 4, 9, 10, 11]:
+            return valor_da_aposta
+        elif soma == 2:
+            return valor_da_aposta * 2
+        elif soma == 12:
+            return valor_da_aposta * 3
+    else:
+        return 0
+
+def any_craps(vai_apostar, valor_da_aposta, soma):
+
+    if vai_apostar:
+        if soma in [2, 3, 12]:
+            return valor_da_aposta * 7
+        else:
+            return -valor_da_aposta
+    else:
+        return valor_da_aposta
+
+def twelve(vai_apostar, valor_da_aposta, soma):
+
+    if vai_apostar:
+        if soma == 12:
+            return valor_da_aposta * 30
+        else:
+            return -valor_da_aposta
+    return valor_da_aposta
+
+def pass_line_bet(vai_apostar, valor_da_aposta, soma):
     
     if soma in [2, 3, 12]:
-        aposta = -aposta
+        return (-valor_da_aposta, False, soma)
     elif soma in [4, 5, 6, 8, 9, 10]:
-        print("Você foi para o Point!")
-        return (True, soma, aposta)
+        return (-valor_da_aposta, True, soma)
     
-    return (False, soma, aposta)
-
-def field(soma):
-    aposta = float(input("Quanto deseja apostar no Field? "))
-
-    if soma in [5, 6, 7, 8]:
-        return -aposta
-    elif soma in [3, 4, 9, 10, 11]:
-        return aposta
-    elif soma == 2:
-        return aposta * 2
-    elif soma == 12:
-        return aposta * 3       
-
-def anyCraps(soma):
-    aposta = float(input("Quanto deseja apostar no Any Craps? "))
-    
-    if soma in [2, 3, 12]:
-        aposta *= 7
-    else:
-        aposta = -aposta
-    return aposta
-
-def twelve(soma):
-    aposta = float(input("Quanto deseja apostar no Twelve? ")) 
-    
-    if soma == 12:
-        aposta *= 30
-    else:
-        aposta = -aposta
-    return aposta
-
+    return (valor_da_aposta, False, soma)
 
 def come_out(dinheiro):
 
